@@ -79,19 +79,19 @@ that building its GLP-compliant infrastructure cost $623,000 over three years,
 nearly half of which went to gap analyses, external consulting and training
 [@littrell2020costs].
 
-Commercial electronic QMS (eQMS) software adds to these costs. Vendors rarely
+Commercial electronic QMS (eQMS) software adds to these costs.  Vendors rarely
 publish prices, but licenses typically run to tens of thousands of dollars a
-year even for a small team, and the software arrives as a largely
-empty, configurable platform. The SOPs, forms and workflows that make it a
-quality system must still be written, configured and validated, usually by
-consultants at additional cost.
+year even for a small team, and the software arrives as a largely empty,
+configurable platform.  The SOPs, forms and workflows that make it a quality
+system must still be written, configured and validated, usually by consultants
+at additional cost.
 
-These costs are not wasted.  At the University of Kentucky, industry-funded 
-research more than doubled after the quality system was established, and annual
-maintenance fell to about 9% of the initial cost [@littrell2020costs].  But the
-investment comes up front, and few academic labs can absorb it.  Quality
-systems therefore remain largely confined to industry and a small number of
-well-funded academic facilities.
+Investment in quality is not wasted.  At the University of Kentucky,
+industry-funded research more than doubled after the quality system was
+established, and annual maintenance fell to about 9% of the initial cost
+[@littrell2020costs].  But the investment comes up front, and few academic labs
+can absorb it.  Quality systems therefore remain largely confined to industry
+and a small number of well-funded academic facilities.
 
 ## 3. The Solution
 
