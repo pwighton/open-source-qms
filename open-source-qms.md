@@ -63,7 +63,43 @@ preventive action (CAPA), and change control make research repeatable inside
 the lab, and they produce the documented record that a sponsor or regulator
 needs to see from outside it.
 
+### 2.4 The Cost Barrier
+
+Even where academic institutions recognize the need for a quality system, the
+cost of establishing one is often prohibitive.  Historically, academia has not
+had dedicated quality assurance personnel and has had difficulty funding these
+positions [@adamo2014options].  Academic laboratories face a "lack of funding
+for compliance costs" and high staff turnover due to a dependence on students
+as temporary personnel [@timoteo2021digital; @littrell2020costs].  As a
+result, the cost of implementing quality management is often a deterrent
+[@littrell2020costs].
+
+The published figures bear this out.  The University of Kentucky estimates
+that building its GLP-compliant infrastructure cost $623,000 over three years,
+nearly half of which went to gap analyses, external consulting and training
+[@littrell2020costs].
+
+Commercial electronic QMS (eQMS) software adds to these costs. Vendors rarely
+publish prices, but licenses typically run to tens of thousands of dollars a
+year even for a small team, and the software arrives as a largely
+empty, configurable platform. The SOPs, forms and workflows that make it a
+quality system must still be written, configured and validated, usually by
+consultants at additional cost.
+
+These costs are not wasted.  At the University of Kentucky, industry-funded 
+research more than doubled after the quality system was established, and annual
+maintenance fell to about 9% of the initial cost [@littrell2020costs].  But the
+investment comes up front, and few academic labs can absorb it.  Quality
+systems therefore remain largely confined to industry and a small number of
+well-funded academic facilities.
+
 ## 3. The Solution
+
+We propose a free, lightweight, open-source quality management system for
+academic research, built on git, the version-control system researchers already
+use for code.  Because the controls that make research reproducible are the same
+controls that make it submission-ready, a single QMS can address both the
+reproducibility crisis and the translation gap.
 
 ## 4. Why *Open Source*
 
