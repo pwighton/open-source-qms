@@ -39,7 +39,29 @@ corroborative support, and only where they are "carefully conducted and
 documented". Reports lacking the details that permit scientific evaluation are
 not considered at all [@cfr314.126].
 
-### 2.3 The Shared Root Cause 
+### 2.3 The Shared Root Cause
+
+The reproducibility crisis and the translation gap are usually treated as
+separate problems, but they share a root cause.  Reproducibility is a question
+of *internal repeatability*: can the work be repeated, by the same lab or
+another, and produce the same result?  Translatability is a question of
+*external acceptability*: can someone outside the lab, such as a sponsor or a
+regulator, trust how the work was done well enough to rely on it?  Both depend
+on research being conducted under defined, documented and controlled
+processes.  They are the same requirement viewed from different directions.
+
+A lack of consistent research quality systems is one of the systemic causes of
+irreproducibility, and there are few standards for quality management in life
+science research [@global2013case].  Standards are expected to make research
+outcomes "credible, reproducible, and translatable" alike [@global2013case],
+and the FDA encourages sponsors to take a risk-based quality management
+approach to study oversight [@fda2023rwe].
+
+Therefore one set of controls can serve both ends.  Standard quality management
+processes such as document control, versioning, risk management, corrective and
+preventive action (CAPA), and change control make research repeatable inside
+the lab, and they produce the documented record that a sponsor or regulator
+needs to see from outside it.
 
 ## 3. The Solution
 
