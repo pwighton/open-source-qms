@@ -211,7 +211,55 @@ QMS, every new adopter increases its value to all the others.
 
 ### 4.5 A Teaching Artifact
 
+Academic investigators often "lack experience in drug development and
+regulatory processes" [@coller2009traversing], and there are few accessible
+ways to gain it.  Regulations and standards are written for compliance, not
+instruction, and the working QMSs that show how they are applied in practice
+are held privately by the companies and institutions that built them.
+
+An open-source QMS is readable by anyone.  A student or new investigator can
+see how an abstract requirement becomes a concrete procedure, form and record,
+and, through the history described in Section 4.3, why it was written that
+way.  Because it can be copied and modified freely, it can also be practiced
+on.  A lab can trial a procedure, or a course can build exercises around it,
+without any risk to a live quality system.
+
+Academia is, above all, a training environment.  The high staff turnover that
+makes quality systems hard to sustain is "inherent to the training environment
+of academia" [@littrell2020costs], which also means a steady stream of
+students and trainees passes through every lab.  Institutions that conduct
+regulated research already value the opportunity "to teach students, staff,
+and faculty how to perform regulated research" [@adamo2014options].  An
+open-source QMS lets every institution offer that, whether or not it runs
+regulated studies, and sends trainees on to their next position already
+literate in quality management.
+
 ### 4.6 Extensibility Across Domains
+
+Most of a QMS is not specific to any one kind of research.  Document control,
+change control, training records, CAPA and internal audit work the same way
+whether a lab is running an observational study or developing software.  The
+QMS is therefore structured as a domain-agnostic core, with domain-specific
+overlays that add the procedures, forms and regulatory mappings a particular
+field needs.  A new domain does not need a new QMS, only a new overlay.
+
+The two domains already built, software medical devices and observational
+studies (Section 5), are quite different from each other, which suggests the
+core generalizes.  Candidate future domains include imaging core facilities,
+biobanks, AI/ML model development and wet-lab protocols, each of which faces
+reproducibility and quality pressures of its own.
+
+Medical device startups are a particularly natural extension.  Many begin as
+academic spinouts, carrying a discovery out of the lab and into the valley of
+death described in Section 2.2.  Discoveries made at academic medical centers
+are typically handed to industry for development, yet "early stage
+(biotechnology) entities often are poorly suited to this task"
+[@stamler2003].  A device company generally needs a QMS aligned with ISO 13485
+to bring a product to market, and it needs one at the point when it can least
+afford one.  The existing software medical device QMS (Section 5) already
+covers much of this ground, and a device overlay built on the same core would
+let a spinout carry its parent lab's quality system with it rather than
+starting again from scratch.
 
 ## 5. Prior Work
 
