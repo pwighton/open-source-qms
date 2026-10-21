@@ -101,7 +101,7 @@ use for code.  Because the controls that make research reproducible are the same
 controls that make it submission-ready, a single QMS can address both the
 reproducibility crisis and the translation gap.
 
-## 4. Why *Open Source*
+## 4. The Benefits of an Open-Source QMS
 
 An open-source QMS removes the licensing cost, but being open source does more
 than that.  It changes how the QMS is built, maintained, and trusted.
@@ -182,6 +182,32 @@ answer the question that both an auditor and a new staff member will
 eventually ask.  Why do we do it this way?
 
 ### 4.4 Network Effects
+
+Each site that adopts a common QMS makes it more valuable to every other site.
+
+For sponsors and regulators, a shared framework means evaluating one QMS
+rather than many.  Today, a sponsor considering an academic partner, or data
+generated in academia, must assess each institution's quality system on its
+own terms.  If sites share a common, public QMS, the sponsor can review it
+once and then focus on how each site has adapted and followed it.  Familiarity
+itself has value.  The University of Kentucky reports that having "a QM
+framework familiar to the pharmaceutical/device industry" broadened its
+industry collaborations [@littrell2020costs].  A QMS shared across many
+institutions extends that familiarity to all of them, which directly narrows
+the translation gap described in Section 2.2.
+
+For multi-site studies, a shared QMS means sites start from the same
+procedures.  Irreproducibility fundamentally "stems from undefined variance in
+reagents, practices, and assays between laboratories" [@global2013case].
+Sites that follow the same documented procedures remove one source of that
+variance by default, rather than negotiating common procedures for each new
+collaboration.
+
+These benefits compound.  Every site that adopts the QMS adds to the pool of
+reviewers, contributors and evidence that it works, and makes the QMS more
+attractive to the next site.  With a commercial eQMS, each new customer adds
+revenue for the vendor but nothing for other customers.  With an open-source
+QMS, every new adopter increases its value to all the others.
 
 ### 4.5 A Teaching Artifact
 
