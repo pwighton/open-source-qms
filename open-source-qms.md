@@ -104,7 +104,7 @@ reproducibility crisis and the translation gap.
 ## 4. Why *Open Source*
 
 An open-source QMS removes the licensing cost, but being open source does more
-than that. It changes how the QMS is built, maintained, and trusted.
+than that.  It changes how the QMS is built, maintained, and trusted.
 
 ### 4.1 Eliminating Duplicated Effort
 
@@ -118,7 +118,7 @@ from one site to the next: the regulations being met are the same, and so are
 most of the controls needed to meet them.  The cost of building a QMS is paid
 many times over for what is essentially the same artifact.
 
-Commercial eQMS vendors do not remove this duplication, they monetize it.  As
+Commercial eQMS vendors do not remove this duplication.  They monetize it.  As
 described in Section 2.4, each customer pays for a largely empty platform and
 then pays again to have it filled with SOPs, forms and workflows much like
 those every other customer has already paid for.
@@ -127,11 +127,36 @@ Sharing what has already been built changes this.  The University of
 Kentucky's Good Research Practice Resource Center, for example, provides
 templates for building a quality management system through consultation and
 training with the researchers it supports [@littrell2020costs].  An
-open-source QMS extends that model beyond a single institution. The core is
+open-source QMS extends that model beyond a single institution.  The core is
 written once, maintained collectively, and adapted locally, so each new site
 starts from a working system rather than a blank page.
 
 ### 4.2 Best Practices Become Reviewable and Contestable
+
+Today, the knowledge of how to interpret regulations and turn them into
+working controls is largely tacit.  It lives in the heads of experienced
+quality staff and in the files of individual institutions, and it is most
+often obtained by hiring consultants.  At the University of Kentucky, the GLP
+implementation relied on "specialized external consultants who have
+regulatory expertise" [@littrell2020costs].  The resulting interpretations are
+rarely published, so they cannot be compared, cited, or challenged.
+
+A public repository changes this.  Every SOP, and every interpretation it
+embodies, is visible to anyone.  Each version is recorded, so a site can cite
+exactly which version it adopted.  Anyone can raise a concern or propose an
+improvement, and the discussion is recorded alongside the change it led to.
+Interpretations that are wrong or outdated can be challenged in the open
+rather than repeated in private.
+
+This is peer review applied to *process*, which Section 2.1 noted academia
+rarely has.  It is also how successful shared standards have been built
+before.  The World Wide Web Consortium and the Internet Engineering Task Force
+steered competing organizations toward common standards through open,
+collaborative work, and the life sciences need a similar "dynamic,
+collaborative effort to standardize common scientific processes"
+[@freedman2015economics].  An open-source QMS gives the field a place to do
+that work, and to converge over time on controls the community as a whole has
+reviewed.
 
 ### 4.3 Rationale Is Preserved, Not Just the Requirement
 
