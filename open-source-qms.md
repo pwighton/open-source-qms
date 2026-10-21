@@ -103,7 +103,33 @@ reproducibility crisis and the translation gap.
 
 ## 4. Why *Open Source*
 
+An open-source QMS removes the licensing cost, but being open source does more
+than that. It changes how the QMS is built, maintained, and trusted.
+
 ### 4.1 Eliminating Duplicated Effort
+
+Today, an institution that needs a QMS largely builds its own.  Each one
+commissions its own gap analysis, engages its own consultants, and writes its
+own SOPs, forms and workflows.  At the University of Kentucky, nearly half of
+the initial cost of its GLP-compliant infrastructure went to gap analyses,
+external consulting and training [@littrell2020costs], and every other
+institution must pay for the same work.  Yet the result is largely the same
+from one site to the next: the regulations being met are the same, and so are
+most of the controls needed to meet them.  The cost of building a QMS is paid
+many times over for what is essentially the same artifact.
+
+Commercial eQMS vendors do not remove this duplication, they monetize it.  As
+described in Section 2.4, each customer pays for a largely empty platform and
+then pays again to have it filled with SOPs, forms and workflows much like
+those every other customer has already paid for.
+
+Sharing what has already been built changes this.  The University of
+Kentucky's Good Research Practice Resource Center, for example, provides
+templates for building a quality management system through consultation and
+training with the researchers it supports [@littrell2020costs].  An
+open-source QMS extends that model beyond a single institution. The core is
+written once, maintained collectively, and adapted locally, so each new site
+starts from a working system rather than a blank page.
 
 ### 4.2 Best Practices Become Reviewable and Contestable
 
