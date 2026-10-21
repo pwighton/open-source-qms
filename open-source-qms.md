@@ -160,6 +160,27 @@ reviewed.
 
 ### 4.3 Rationale Is Preserved, Not Just the Requirement
 
+Boilerplate SOPs record what must be done.  They rarely record why.  The
+reasoning behind a control, such as the regulation it answers, the
+alternatives that were rejected, or the problem it was written to fix, usually
+lives only in the memory of the people who wrote it.  In academia, where staff
+turnover is high (Section 2.4), those people are often gone within a few
+years, and the reasoning goes with them.  The control then becomes something
+to follow without understanding, or to quietly drop.
+
+A QMS built on git keeps that reasoning.  Every change is recorded with who
+made it, when, and why, and the discussion that led to it stays linked to the
+change itself.  The same applies to the QMS's own reviews.  Gap analyses, the
+findings they raise, and the remediations that close them become part of the
+public record rather than a report filed away and forgotten.
+
+This matters for audits as well as for continuity.  Regulators expect changes
+to be explained, not just made.  FDA guidance, for example, asks that
+revisions to a study protocol be "date-stamped," with "the rationale for each
+change" provided [@fda2023rwe].  A QMS that carries its own reasoning can
+answer the question that both an auditor and a new staff member will
+eventually ask.  Why do we do it this way?
+
 ### 4.4 Network Effects
 
 ### 4.5 A Teaching Artifact
