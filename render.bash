@@ -8,7 +8,7 @@ cd "$(dirname "$0")"
 
 SRC="open-source-qms.md"
 BIB="refs.bib"
-CSL="ieee.csl"  # numeric [1] citations, from citation-style-language/styles
+CSL="pandoc/ieee.csl"  # numeric [1] citations, from citation-style-language/styles
 OUT="open-source-qms.pdf"
 
 # Preflight checks
@@ -40,7 +40,7 @@ pandoc "$SRC" \
   --csl="$CSL" \
   -M reference-section-title=References \
   -H "$WORKDIR/header.tex" \
-  --lua-filter=caption-below.lua \
+  --lua-filter=pandoc/caption-below.lua \
   --pdf-engine=tectonic \
   -V geometry:margin=1in \
   -o "$OUT"
