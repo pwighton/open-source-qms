@@ -387,4 +387,38 @@ an export of the very history an auditor may ask to see.
 
 ### 5.4 Cost
 
+Because the QMS needs only features common to every forge (Section 5.3), an
+institution can choose the hosting arrangement that suits its budget.
+
+- **Self-hosted.**  Gitea and Forgejo are free, open-source forges that
+  provide every primitive in Table 1, including protected branches and
+  required approvals [@giteabranches; @forgejobranches].  The cost is a
+  modest server and the staff time to administer it.
+- **Hosted.**  On hosted forges, the features that turn a forge into a QMS
+  are in paid tiers.  On GitHub, protected branches on private repositories
+  and required reviewers need the Team plan, listed at $4 per user per month
+  [@githubpricing; @githubbranches].  On GitLab, approvals on the free tier
+  are "optional and don't prevent merging without approval", and required
+  approvals need Premium, at $29 per user per month [@gitlabapprovals;
+  @gitlabpricing].  For a team of 20, that is roughly $1,000 or $7,000 a year
+  respectively, compared with the tens of thousands of dollars a year typical
+  of a commercial eQMS (Section 2.4).
+- **Academic programs.**  Both vendors offer free plans to academics, with
+  conditions.  GitHub offers free GitHub Team to "verified academic faculty
+  … for teaching or academic research" [@githubdiscounts; @githubeducation].
+  GitLab for Education offers free licenses to accredited, not-for-profit
+  institutions whose "primary purpose" is teaching, for "non-commercial
+  academic research", but not for "IT operations or campus administration"
+  or "commercial research or revenue generation" [@gitlabeducation].  An
+  institution-wide QMS, or a study sponsored by industry, falls outside
+  GitLab's terms and is not clearly covered by GitHub's, so these offers suit
+  pilots and grant-funded research better than an institution's production
+  QMS.
+
+The larger saving is not in license fees.  As Section 4.1 argued, the real
+cost of a QMS lies in writing and maintaining its content, and an open-source
+QMS shares that cost across every institution that adopts it.  Removing both
+the license fee and the work of building a QMS from scratch addresses the two
+main barriers to adoption in academia.
+
 ## 6. Prior Work
