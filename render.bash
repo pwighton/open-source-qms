@@ -33,6 +33,7 @@ pandoc "$SRC" \
   --citeproc \
   --bibliography="$BIB" \
   --csl="$CSL" \
+  -M reference-section-title=References \
   --pdf-engine=tectonic \
   -V geometry:margin=1in \
   -o "$OUT"
