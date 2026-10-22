@@ -28,7 +28,7 @@ that would close each gap.  The aim is a design that:
 | Row | Requirement | Status | Details |
 |---|---|---|---|
 | 1 | Identity (11.100, 11.200, 11.300) | Solved: forge accounts or keys mapped to people in a controlled signer registry; several authentication options (Section 6.5) | Sections 5.1, 6.5, 7.2 |
-| 2 | Signature/record linking (11.70) | Solved for documents stored as files (signed tags on document blobs). **Open for records stored as forge issues** | Sections 5.2, 6.2 |
+| 2 | Signature/record linking (11.70) | Solved for documents (signed tags on document blobs) and for issue-based records (signed snapshots committed to git at defined signature points).  Open: snapshot format and signature points per record type | Sections 5.2, 5.2.1, 6.2 |
 | 3 | Meaning (11.50(a)(3)) | Solved: Approvals-table roles as meanings, inside the signed tag | Sections 5.3, 5.3.1 |
 | 4 | Date and time (11.50(a)(2), 11.10(e)) | Solvable: RFC 3161 trusted timestamps.  Choices open | Section 5.4 |
 | 5 | Authentication at signing (11.200, 11.300) | Solved, with several options: device keys (hardware token, built-in TPM/Secure Enclave, phone passkey), a re-authenticating server (commercial, self-hosted, or added to an open-source forge), or handwritten signatures on rendered copies.  Strongest: FIDO2 token with PIN and touch, provable from the signature | Sections 5.5, 6.5 |
@@ -44,8 +44,8 @@ server-free option is a FIDO2 hardware token requiring PIN and touch.
 
 **Open decisions:**
 
-- records stored as forge issues: keep signed records as files, sign a
-  snapshot, or exclude them from Part 11 signatures (Section 5.2);
+- issue-based records: the snapshot format, and the signature points for
+  each record type (Section 5.2.1);
 - effective date: set before signing, or kept out of the file and filled at
   render time (Section 5.3.1);
 - which timestamping authority, and where tokens are stored (Section 5.4);
@@ -277,7 +277,7 @@ document revision was signed.
 real but configurable, editable and forge-bound.
 
 **Status of row 2 (2026-10-22): solved by design for documents stored as
-files; open for records stored as issues.**
+files, and for issue-based records via signed snapshots (Section 5.2.1).**
 
 *How it is solved.*  Each signature is a signed tag on the document's blob
 (Section 6.2).  The tag names the content by its hash, and the signature
@@ -317,21 +317,104 @@ separate record.  Against each part of 11.70:
 4. **Validation of the verifier.**  CI enforces all of the above, so it must
    be validated (pitch Section 8.2).
 
-*Not covered: records stored as forge issues.*  The design signs files.  The
-pitch (Section 5.1) puts nonconformities, CAPAs and audit findings in forge
-issues, whose text, comments and status live in the forge's database, not in
-git.  If such a record needs a Part 11 signature (e.g. approving a CAPA's
-closure), signed blobs do not reach it.  Options:
+#### 5.2.1 Issue-Based Records
 
-- (a) records that need signatures are kept as files (e.g. `CAPA-012.md`),
-  with the issue used only to track the work; they are signed like SOPs
-  (most consistent with this design);
-- (b) CI renders the issue to a file at the moment of approval, and that
-  snapshot is signed (needs an issue-to-file export step);
-- (c) issue-based records do not carry Part 11 signatures, stated in the
-  pitch's Section 7 tiers.
+**The problem.**  The pitch (Section 5.1) puts nonconformities, CAPAs and
+audit findings in forge issues.  An issue's title, description, comments,
+labels and open/closed history live in the forge's database, not in git, and
+can be edited at any time.  The signature design needs *fixed bytes to sign*;
+issues do not naturally have them.
 
-Decision open.
+This is purely a row 2 (linking) question.  Authentication is row 5 and is
+independent: if Alice signs with something only she controls (a device key,
+or a re-authenticated login), someone impersonating her in the forge's web
+interface cannot produce her signature.
+
+**Which issue records need signatures at all.**  Part 11's signature rules
+apply only where a predicate rule (e.g. ICH E6, or ISO 13485 under FDA's
+QMSR) requires a signature or approval.  Many issue-based records need only to
+exist and be retained.  The practical problem is therefore specific *approval
+moments* in an issue's lifecycle (e.g. "CAPA plan approved", "CAPA closed as
+effective", "audit report approved"), which the QMS lists per record type.
+
+**Recommended: a signed snapshot committed to git.**  At each defined
+signature point:
+
+1. CI (or the signing helper) writes the issue's current state (description,
+   comments, labels, status history) in a defined, deterministic format and
+   commits it to git, e.g. `records/capa/CAPA-012/closure-approval.md`;
+2. the signers review it and sign it exactly as they would an SOP: a signed
+   tag on that file's blob, with the chosen authentication (row 5), a trusted
+   timestamp (row 4), and rendering (row 6);
+3. linking is then identical to documents: the signature is bound to the
+   snapshot's hash, cannot be moved to other content, and anyone can verify it
+   from git.
+
+Once the snapshot exists, an issue record *is* a file, and every row is solved
+by the same mechanism.  The issue remains the working tool (lifecycle,
+discussion, assignment); the snapshot is the signed record.  Edits made to
+the issue after a snapshot are not covered by its signatures, which is
+correct: the snapshot is what was approved.  DearAuditor does something
+similar for training records, hashing the issue body (Section 6.7.3); the
+snapshot captures the whole issue and keeps it in git.
+
+Remaining decisions are procedural:
+
+- *when* snapshots are taken: the signature points per record type;
+- *what* goes in them: which fields, all or selected comments, how status
+  changes are shown;
+- an *Approvals table* in each snapshot listing the required roles, so the
+  existing CI checks and rendering apply.
+
+**Alternative: content preserved in an independent event log.**  Forges can
+send events to an outside system as they happen.  If that log captures *full
+content* and is *complete*, it shows exactly what the issue said when Alice
+signed, so it can play the snapshot's role:
+
+1. the helper fetches the issue's current state, writes it in the defined
+   format, and computes its hash;
+2. Alice reviews and signs the hash (row 5), with a trusted timestamp (row 4);
+3. the signature is stored (as a detached signature file in git, or in the
+   log, since a git tag must point at a git object), but the content is not
+   committed: the log holds it;
+4. to verify later, the issue is rebuilt as of the signing time by replaying
+   the log, serialised in the same format, hashed, and compared with the
+   signature.
+
+Which event sources qualify: *webhooks* (all forges, including Gitea and
+Forgejo) generally carry content: the full description of a new issue, each
+new comment, and for edits both the new text and what it changed from.
+*Audit logs* (the enterprise streaming features of GitHub and GitLab)
+typically record *that* something happened without the text, which is not
+enough on its own **(verify per forge)**.
+
+| | Snapshot committed to git | Content kept in the log |
+|---|---|---|
+| Where the signed bytes live | In git, as a file | Rebuilt from the event log |
+| Verification | Hash the file and check the signature, with standard tools | Replay the log to the signing time, serialise, hash, check; needs replay code and log access |
+| What must be exactly right | Only the snapshot step, run once at signing | Serialisation *and* replay must reproduce the original bytes years later; the log must be complete |
+| Signature storage | Signed tag on the snapshot's blob, as for documents | Elsewhere (detached signature file in git, or in the log) |
+| What else it gives you | Little beyond the signed record | A full, independent history of every issue, signed or not (Section 5.4) |
+| New components | A snapshot step | Log receiver, write-once storage, replay and serialisation code, reconciliation job |
+
+*Recommendation.*  Both satisfy linking.  The snapshot is simpler and more
+robust for signatures: the exact signed bytes sit in git, and verification is
+the standard check used for every document.  The log-based approach depends
+on rebuilding those bytes correctly from an event stream, potentially years
+later, which is more to get right and to validate.  The two combine
+naturally: the snapshot is "the log's view of the issue at the signing
+moment, written down".  An institution that runs an independent log anyway
+(for its audit-trail benefits, Section 5.4) can generate snapshots from it,
+and the log then independently confirms that each snapshot faithfully
+reflects the issue's history.
+
+**Other options considered.**  (a) Keep records that need signatures as files
+from the start (e.g. `CAPA-012.md` changed by pull requests), with the issue
+used only to track work: fully consistent, but clunkier, and gives up much of
+what makes issues convenient; reasonable for record types where a pull
+request workflow feels natural.  (c) Exclude issue-based records from Part 11
+signatures: honest but leaves out the records (CAPAs, audits) that most often
+need approval.
 
 ### 5.3 Row 3: Meaning of the Signature (11.50(a)(3))
 
@@ -602,6 +685,36 @@ give every change to a controlled document an independent time: CI requests a
 timestamp for each merge commit on `main` and stores it the same way.  The
 git history then becomes an audit trail whose times are independent of the
 people making changes.
+
+**Optional: an independent, append-only event log.**  The forge's own records
+(issue edits, comments, approvals, settings changes) live in its database,
+which an administrator can change without trace.  An independent log closes
+this gap:
+
+- forge events are sent as they happen (webhooks on every forge; audit-log
+  streaming on enterprise tiers of GitHub and GitLab **(verify)**) to a
+  receiver that writes them to *write-once* storage that cannot be altered or
+  deleted for a set period, even by its own administrator (e.g. Amazon S3
+  Object Lock in compliance mode **(verify)**);
+- entries are hash-chained and the chain periodically timestamped (RFC 3161),
+  so tampering with the log itself is detectable; sequence numbers or
+  heartbeat events reveal gaps (e.g. webhooks switched off);
+- the log server is administered by *different people* from the forge, so
+  falsifying the record undetectably requires both: the "collaboration of two
+  or more individuals" that 11.200(a)(3) asks for;
+- a periodic reconciliation job compares the forge's database with the log;
+  direct database edits generate no event, so they show up as mismatches.
+
+What it gives: tamper-evidence for the forge's database; an independent audit
+trail with server time (11.10(e)); an independent, portable copy of every
+issue's history (11.10(b), (c)), useful even for records never signed.  What
+it does not give: authentication at signing (row 5), or a signer's own
+binding of an approval to content (row 2).  It records what the forge
+reports, so actions done *through* the forge (e.g. an administrator
+impersonating a user) are logged as normal events, though some forges also
+log the impersonation itself **(verify)**.  It is an optional audit-trail
+control, independent of the signature design, and an alternative way of
+preserving signed issue content (Section 5.2.1).
 
 **Status of row 4: solvable by design; choices open.**  RFC 3161 timestamps
 give an independent, verifiable, portable time for each signature (and
@@ -1755,7 +1868,9 @@ browser.
   merges on `main` too?  Verify free TSA terms of use, git-notes display and
   protection on forges, GitHub events retention, Sigstore timestamp service,
   OpenTimestamps git integration.
-- Records stored as issues: option (a), (b) or (c) (Section 5.2 status).
+- Issue-based records: snapshot format; signature points per record type;
+  which issue records need Part 11 signatures under the predicate rules
+  (Section 5.2.1).
 - Effective date: set before signing (a) or kept out of the file and filled
   at render time (b) (Section 5.3.1).
 - Whether GitLab stores the approval-rule name with each approval.
