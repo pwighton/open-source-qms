@@ -275,8 +275,8 @@ changing an earlier commit changes the identity of every commit after it.  A
 
 Git is usually used through a hosting platform, or *forge*, such as GitHub,
 GitLab, Gitea or Forgejo.  A forge hosts many repositories, each of which can
-be public or restricted to named people.  Forges add two features that matter
-here.  A *pull request* (a *merge request* on GitLab) proposes a change, shows
+be public or restricted to named people.  Forges add two key features. 
+A *pull request* (a *merge request* on GitLab) proposes a change, shows
 exactly what would change, and records the review, discussion and approval
 before the change is accepted.  An *issue* is a tracked item, such as a
 problem report or a task, with its own discussion and history.  Forges can
