@@ -54,6 +54,10 @@ server-free option is a FIDO2 hardware token requiring PIN and touch.
 - where rendered copies are published, and whether CI signs PDFs
   (Section 5.6).
 
+Related work: DearAuditor's open-source GitHub-native eQMS implements a
+working Part 11 signing ceremony; Section 6.7 audits it and compares it with
+this design.
+
 Items still to verify are collected in Section 9.
 
 ## 2. Background and Terminology
@@ -1160,7 +1164,9 @@ branch head that moves).  Its design is Family B (Section 6.5):
 - a "ceremony screen" shows meaning, role, signer and target hash;
 - the worker records name, meaning, UTC time and exact commit hash as a
   "cryptographically bound attestation", published with the release under an
-  evidence tag that is never moved or reused.
+  evidence tag that is never moved or reused.  (The audit in Section 6.7 finds
+  that, in the code at commit 6b69e20, this attestation is an unsigned JSON
+  comment; the PIN is a reusable, user-chosen 6-digit code.)
 
 It states that "Part 11 compliance is a property of an operating installation,
 never of a piece of software."
@@ -1170,7 +1176,7 @@ never of a piece of software."
 | | DearAuditor | This design |
 |---|---|---|
 | Who authenticates the signer | External server (Cloudflare Worker) checks a PIN | Recommended: signer's own device (token); server options also mapped (Section 6.5) |
-| What is signed | Commit hash, recorded by the worker | The individual document's blob |
+| What is signed | Nothing cryptographically; an unsigned attestation records a hash of `repo:mergeCommitSHA` (see Section 6.7) | The individual document's blob |
 | Where signature records live | Attached to GitHub Releases | Signed git tags in the repository |
 | Forge dependence | GitHub-specific (Apps, Actions, Releases) | Forge-neutral |
 | Audience | Medical device and regulated software teams | Academic research institutions |
@@ -1221,6 +1227,283 @@ open-source GitHub-native QMS has a working signature service.  This design's
 distinguishing contributions are: forge neutrality; signatures stored in git
 as signed tags on individual document content; a server-free device-key
 option; trusted timestamps; and the academic-research focus.
+
+### 6.7 Audit of DearAuditor's Part 11 Implementation
+
+*Audited 2026-10-22 against a local clone at commit 6b69e20 (2026-08-26) of
+https://github.com/AliakseiT/dearauditor-qms-baseline.  The project is active,
+so details may change.  File references are relative to the repository root.
+Statements are labelled **[code]** (what the code does), **[docs]** (what its
+documentation or SOPs say) or **[obs]** (our observation).  The most
+consequential [code] findings were re-checked directly against the source.*
+
+#### 6.7.1 What the project claims
+
+- **[docs]** It does *not* claim Part 11 compliance.
+  `docs/adoption/profiles.md` (line 232) and `matrices/adoption_profiles.yml`
+  (line 328) say a Part 11 / Annex 11 mapping is "not asserted by the
+  baseline" / "NOT asserted by the baseline".
+  `matrices/gamp5_gxp_gap_analysis.yml` rates "Electronic records /
+  signatures (21 CFR Part 11, EU Annex 11)" as `partial`, leaving a
+  "Control-by-control Part 11 / Annex 11 mapping" to the adopter.
+  `DISCLAIMER.md` makes the adopter responsible for "validating the automation
+  and electronic-signature implementation".
+- **[docs]** The "GAMP 5 / Part 11 overlay" is a gap-analysis matrix
+  (`matrices/gamp5_gxp_gap_analysis.yml`, `status: optional_overlay`, for the
+  `clinical_trial_software` profile), added in release R005.  It adds no SOPs
+  or work instructions, and calls the signature ceremony a "Part 11-style …
+  reference example, not a control set for the adopter's regulated system".
+  IQ/OQ/PQ materials are listed as outstanding; none are in the repository.
+- **[docs]** Some text claims more than the code delivers (Section 6.7.5):
+  the worker's PIN page says the PIN ensures approvals "meet strict regulatory
+  and FDA compliance standards"; `AGENTS.md` calls the worker a "Cloudflare
+  Worker for 21 CFR Part 11 electronic signatures".
+
+#### 6.7.2 Architecture
+
+| Component | Role | Secrets / trust |
+|---|---|---|
+| "QMS BOT" GitHub App | Posts request and attestation comments, labels, releases; merges PRs | App private key, held as a repository secret *and* a Worker secret |
+| "QMS SIGN" GitHub OAuth App | Identifies the signer via GitHub login | OAuth client ID and secret (Worker secrets) |
+| Cloudflare Worker (`services/signature-worker/src/index.ts`, ~2,600 lines) | Signing web pages; PIN setup and check; posts the attestation comment | `SIGNATURE_STATE_SECRET` (HMAC key for 10-minute session tokens), `PIN_PEPPER`, KV store `PIN_KV` |
+| GitHub Actions workflows | Merge gates (1.x), signature request and publication (2.x), training (3.2), worker deployment (4.1) | Cloudflare API token, account ID |
+| Scripts | Signature policy (`scripts/resolve_signature_policy.py`), role matching, certificate PDF (`scripts/generate_part11_title_page.py`) | Run on Actions runners |
+
+#### 6.7.3 The signing flow, step by step
+
+1. **Declaration.**  [code] The PR body carries `Meaning of Signature`,
+   `Signer Roles` and `Required Signatures`
+   (`.github/pull_request_template.md`).
+   For changes under `qm/` or `sops/`, the policy script forces "Approved
+   Controlled Document Revision", roles "Management Representative; Quality
+   Assurance Lead", and 2 signatures.  Role eligibility comes from the
+   *training matrix* (`matrices/training_matrix.yml`), not the signer
+   registry.  The PR author always counts as one of the signers.
+2. **Review and merge, before any signature.**  [code] Once non-author
+   approvals on the head commit cover the required roles, workflow 1.3 merges
+   the PR with a *squash* merge.
+3. **Signature request, after merge.**  [code] Workflow 2.1 runs on
+   `pull_request: closed` when merged.  It computes the *target hash* as
+   SHA-256 of the string `"owner/repo:<merge commit SHA>"`, and posts a
+   comment with a hidden JSON block (hash, meaning, required signatures,
+   signers) and a link per signer to the Worker:
+   `/sign?repo=…&pr=…&signer=…&role=…`.
+4. **The signer's ceremony.**  [code] The Worker's page shows the repository,
+   PR, target hash, meaning, role and designated signer (not the document
+   content; it links to the PR), with "Continue with GitHub".  The GitHub OAuth
+   login must return the designated signer's account.  The Worker re-checks
+   hash, meaning and role against the latest request comment, reads the
+   signer's `full_name` and `job_title` from `matrices/signer_registry.json`,
+   then asks for the PIN.
+   - [obs] GitHub's OAuth flow completes silently if the user is already
+     logged in to GitHub and has authorised the app before, so the first
+     component is usually the existing GitHub browser session, not a re-entered
+     password **(verify)**.  The page's own text says the PIN avoids having to
+     "re-authenticate with GitHub for every single signature".
+5. **The PIN.**  [code]
+   - user-chosen, exactly 6 digits, entered twice at setup;
+   - stored as PBKDF2-SHA256 (100,000 iterations, random salt, server-side
+     pepper) in Cloudflare KV, keyed by GitHub user ID;
+   - a *reusable* per-user credential (not per signature, not a one-time code
+     or TOTP); expires after 60 days (KV time-to-live), with a warning in the
+     last 7 days;
+   - **no attempt counter, lockout or alert** (none in the Worker code); a
+     wrong PIN simply returns "Invalid PIN.";
+   - **reset needs only the GitHub login**: the verify page links to PIN setup,
+     and `mode === "setup"` overwrites the stored PIN without checking the old
+     one;
+   - session tokens are valid for 10 minutes and are not single-use.
+6. **Recording.**  [code] The Worker posts, as the GitHub App, a PR comment
+   containing a JSON *attestation*: version, repository, PR number, target
+   hash, meaning, role, the signer's full name and job title, GitHub login and
+   user ID, `timestamp` (the Worker's own clock, `new Date().toISOString()`),
+   `attestation_id` (16 random bytes), `auth_method: "GitHub OAuth App
+   (identity) + QMS PIN"` and `pin_verified: true`.
+   - **[code] The attestation is not signed, keyed-hashed or timestamped by
+     any key.**  `attestation_id` is random, not a digest.
+7. **Publication.**  [code] Workflow 2.4 runs on any comment containing an
+   attestation marker.  It collects all attestation comments matching the
+   hash and meaning and, once enough are present and the author has signed,
+   renders `Electronic_Signature_Certificate_PR<n>.pdf` and
+   `signed_attestation.json`, and publishes them as a GitHub Release tagged
+   `sig-pr<n>-h<hash12>-r<NN>` at the merge commit.  Workflow 2.6 sets
+   `signature/outstanding` or `signature/complete` labels; workflow 2.8
+   creates the formal `QMS-*` release tag only when the release-notes PR has
+   `signature/complete`.
+   - **[code] Workflow 2.4 identifies attestation comments by marker text
+     only** (lines 152 to 160); it does not check that the comment was posted
+     by the bot.  The same pattern appears in workflows 2.2, 2.6, 2.7 and 3.2
+     (per the audit; 2.4 re-checked directly).
+8. **Later verification.**  [code] `tools/validate_github_qms_export.py`
+   checks that required JSON fields exist and that scopes and tags match.
+   There is no cryptographic signature to verify, so authenticity rests on
+   GitHub's record of who posted each comment.
+
+Other record types: QMS releases are signed over a hash of a canonical JSON
+manifest (workflow 2.7), and training records over the *issue body* (workflow
+3.2), i.e. issue-based records are signed via a hash of their content (our
+Section 5.2, option (b)).
+
+#### 6.7.4 Against the six rows
+
+| Row | DearAuditor (code) | Assessment |
+|---|---|---|
+| 1 Identity (11.100) | Unique GitHub accounts; registry maps login to name and job title.  No identity-proofing procedure; no FDA certification letter (11.100(c)) in the repo | Uniqueness relies on GitHub; 11.100(b) and (c) left to the adopter |
+| 2 Linking (11.70) | Target hash = SHA-256 of `repo:mergeCommitSHA`, recorded in an unsigned PR comment.  Signing after merge means the content cannot move after signing; stale request links are rejected | The *reference* to content is precise (commit level), but the attestation is not cryptographically bound to it: anyone able to post a comment with the marker could add a matching attestation, and the bot or Worker operator could post any attestation |
+| 3 Meaning (11.50(a)(3)) | Declared in the PR body; fixed for `qm/` and `sops/`; shown at the ceremony; carried in the attestation and printed on the certificate | Good; comparable to our Approvals-table approach |
+| 4 Time (11.50(a)(2)) | Worker system clock; GitHub comment time as fallback; no trusted timestamping | Server time, independent of the signer, but not independently verifiable and not portable |
+| 5 Authentication (11.200, 11.300) | GitHub OAuth (often a silent session) + user-chosen 6-digit reusable PIN; no lockout or alerting; self-service reset via GitHub login; 60-day expiry | Weak against 11.200(a)(3) and 11.300(c)/(d): a stolen GitHub session can reset the PIN; 10^6 PINs with no lockout; operator with KV access and the pepper could brute-force PIN hashes offline |
+| 6 Manifestation (11.50(b)) | Separate certificate PDF (name, date/time, meaning) published in a GitHub Release | Meets the visible requirement via a title-page certificate; the signed document itself is not stamped |
+
+**Who could create or alter a signature other than the signer** [obs, from
+the code]:
+
+- anyone who can comment on the PR, by posting a marker-plus-JSON comment
+  that the publication workflows would count (no author check);
+- the holder of the GitHub App key or the Worker secrets (the operator), who
+  can post attestations directly or mint sessions;
+- anyone with the signer's GitHub session, who can reset the PIN and sign;
+- anyone with triage rights, who can add the `signature/complete` label that
+  gates the formal release tag.
+
+#### 6.7.5 Inconsistencies and documented limitations
+
+1. **SOP-001 vs code.**  SOP-001 says "The use of a user's GitHub account to
+   approve a pull request under this QMS constitutes their legally binding
+   electronic signature" (line 33) and "Execution of a PR approval in GitHub,
+   when captured by the baseline signature automation, constitutes a legally
+   binding electronic signature" (line 56).  In the code, the PR approval only
+   gates the merge; the signature is the later OAuth-plus-PIN ceremony.
+2. **SOP-001 overstates the evidence.**  It describes "the cryptographically
+   signed `signed_attestation.json` and corresponding immutable GitHub
+   Release/Sigstore attestation bundle" (line 74).  The primary path signs
+   nothing.  A fallback workflow (2.5) computes a self-hash and runs Sigstore
+   `cosign sign-blob`, but its upload is disabled
+   (`UPLOAD_ATTESTATION_ARTIFACT: "false"`), and that path has no second
+   factor.
+3. **The certificate PDF** lists the random `attestation_id` under "Individual
+   Signature Hash(es)" in a "Cryptographic Evidence" section.
+4. **Documented race condition** (`index.ts`, around line 1074): "Two
+   ceremonies submitting PINs simultaneously can both pass this check",
+   producing an extra attestation; the author notes a mutex "would be the
+   next-step mitigation".
+5. **Validation scope.**  The tooling validation record and tooling inventory
+   cover GitHub only; the Worker and Cloudflare are not listed, although the
+   SOPs require validation of e-signature tooling.  No tests for the Worker.
+6. **Smaller drift:** the README says OAuth uses the `read:user` scope but no
+   scope is requested; the architecture doc says the Worker "validates link
+   signatures" but signed links were retired; the Worker reads only the first
+   100 PR comments (no pagination).
+
+These are observations about a young, actively developed project (created
+March 2026) whose author explicitly disclaims Part 11 compliance and assigns
+validation to adopters.  They are not criticisms of intent; several are
+straightforward to fix, and the project is open to issues and contributions.
+
+#### 6.7.6 Comparison with this design
+
+| Aspect | DearAuditor (as implemented) | This design (as specified) |
+|---|---|---|
+| Maturity | Working end to end today | Paper design; nothing built |
+| What constitutes the signature | Unsigned JSON comment posted by a bot after OAuth + PIN | Cryptographic signature (signed git tag) by the signer's key, or by a server key in Family B options |
+| What is bound | Commit (`repo:mergeSHA`), whole change | Individual document blob, per document |
+| When signing happens | After merge | Before merge (CI gate on required signatures) |
+| Authentication | GitHub session + reusable 6-digit PIN | Options (Section 6.5); strongest: FIDO2 token, PIN + touch per signature, provable from the signature |
+| Time | Worker clock | RFC 3161 trusted timestamp |
+| Verifiable offline / after leaving the forge | No (rests on GitHub comment metadata) | Yes (`git verify-tag`, timestamp tokens, registry history) |
+| Revocation | Remove from registry; PIN expires | `valid-before` in registry + `verify-time` = TSA time |
+| Forge / platform | GitHub + Cloudflare | Forge-neutral; no third-party service required |
+| Signer experience | Web only: click link, GitHub login, PIN | Helper or app to install (web-only via a future WebAuthn page) |
+| Issue-based records | Signed via hash of the issue body | Open decision (Section 5.2) |
+| Policy automation | Meaning declaration, role coverage from training matrix, author must sign | Approvals table defines roles; CI enforces; registry authorises roles |
+| Manifestation | Certificate PDF per PR | Approvals table filled in each rendered document |
+
+#### 6.7.7 Pros and cons
+
+**DearAuditor: strengths**
+
+- It exists and works end to end, today, with web-only signing (no installs,
+  no hardware): the lowest-friction user experience of any option considered.
+- Thoughtful policy layer: a declared meaning with a CI gate; signer
+  eligibility tied to the *training matrix* (a person can sign in a role only
+  if trained for it, which also serves 11.10(i)); the author must sign.
+- A ceremony screen showing meaning, role, signer and target hash.
+- A human-readable certificate PDF as manifestation.
+- Signs issue-based records (training) by hashing the issue body.
+- An export tool for leaving GitHub, and immutable release bundles.
+- Honest top-level disclaimers that compliance belongs to the adopter.
+
+**DearAuditor: weaknesses (as implemented at 6b69e20)**
+
+- No cryptographic signature: authenticity rests on GitHub's comment
+  authorship and on trusting the bot and Worker operators.
+- Publication workflows count marker comments without checking the author,
+  so an attestation could be forged by anyone able to comment.
+- Authentication is weak for 11.200/11.300: often-silent OAuth plus a
+  reusable 6-digit PIN with no lockout, resettable with only the GitHub
+  login.
+- Untrusted server time; no trusted timestamping.
+- Signing after merge: content is on `main` before it is signed (the formal
+  release tag is gated, but the branch is not).
+- Commit-level binding (one signature covers the whole change).
+- Tied to GitHub and Cloudflare; signatures are not verifiable after
+  migration except via exported metadata.
+- Docs and SOPs claim more than the code delivers; the Worker is outside the
+  validation inventory.
+
+**This design: strengths**
+
+- Real cryptographic signatures, per document, stored in git and verifiable
+  by anyone, offline, after any migration.
+- Forge-neutral; no required third-party service.
+- Trusted timestamps and clean revocation using standard OpenSSH features.
+- With FIDO2 tokens, authentication at each signing is enforced and provable
+  from the signature, and no server operator can sign as someone else.
+- Signing before merge, enforced by CI.
+
+**This design: weaknesses**
+
+- Not built: every component (helper, CI verifier, render step, PIN-flag
+  check) is still to be written and validated.
+- Higher friction: signers install a helper (or app) and, in the strongest
+  option, carry a token; web-only signing awaits a WebAuthn page or a Family B
+  service.
+- Token logistics and cost (issuance, loss, replacement).
+- Open decisions remain (issue-based records, effective date, authentication
+  options).
+- Verification depends on CI code that must itself be validated.
+
+#### 6.7.8 Lessons and opportunities
+
+*Adopt from DearAuditor:*
+
+1. Tie signing eligibility to the training matrix, not just the signer
+   registry.
+2. A CI gate on the declared meaning and required roles (our Approvals table
+   already plays this part; DearAuditor's PR-body declaration is an
+   alternative for non-document records).
+3. A ceremony screen showing exactly what is being signed.
+4. Signing issue-based records via a hash of their content (Section 5.2,
+   option (b)), as DearAuditor does for training records.
+5. An export tool and documented migration path.
+
+*Avoid:*
+
+1. Counting signatures by marker text without verifying who created them;
+   in this design, CI verifies a cryptographic signature against the registry.
+2. Unsigned attestations; a server, if used (Family B), should sign its record
+   with its own key, timestamped, so it is verifiable later.
+3. Reusable short PINs without lockout, and resets that need only a session.
+4. Signing after merge.
+5. Documentation that claims more than the implementation provides.
+
+*Opportunity.*  Both projects are open source and share the same diagnosis.
+DearAuditor's web ceremony and policy layer could be combined with this
+design's evidence format: for example, its Worker could produce a signed git
+tag on each document blob (Family B2), or replace the PIN with a WebAuthn
+passkey or security-key assertion (Family A4), with RFC 3161 timestamps.
+Contributing such changes upstream, or collaborating, may be more valuable
+than building a parallel implementation.
 
 ## 7. Design
 
@@ -1482,6 +1765,9 @@ browser.
   identification components" (regulatory judgment; Part 11's example is an
   identification code and password).
 - Administrator impersonation on GitLab and GitHub Enterprise Server.
+- DearAuditor (Section 6.7): whether GitHub's OAuth step completes silently
+  for previously authorised users (assumed); re-check findings against later
+  commits; consider contacting the author about collaboration.
 - GitHub "Proof of Presence": whether and when it extends to pull request
   merges and approvals, and whether the two-hour window can be shortened.
 - How the author's CorticoMetrics GitLab QMS handled signatures for the

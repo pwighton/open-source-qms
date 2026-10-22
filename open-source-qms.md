@@ -463,13 +463,14 @@ electronic Quality Management System baseline" for medical device and
 regulated software teams [@dearauditorqms].  It covers ISO 9001, ISO 13485 and
 related standards, with an optional overlay for 21 CFR Part 11, and uses
 GitHub issues, pull requests, workflows and releases as the quality system of
-record.  It also implements Part 11 electronic signatures, using a service
-outside GitHub that requires a time-limited PIN at each approval
-[@dearauditorpart11].  Its SOPs are licensed CC BY-SA 4.0, which permits
-commercial use but requires derivatives to adopt the same license.  It is
-built specifically on GitHub, however, and aimed at companies rather than
-academic research.  On the research side, Chen
-et al. describe a wet lab that runs its experiments through GitHub issues and
+record.  It also includes a signing ceremony intended for Part 11 contexts,
+run by a service outside GitHub that combines a GitHub login with a PIN
+[@dearauditorpart11], although the project states that a Part 11 mapping is
+"not asserted by the baseline" [@dearauditorqms].  Its SOPs are licensed
+CC BY-SA 4.0, which permits commercial use but requires derivatives to adopt
+the same license.  It is built specifically on GitHub, however, and aimed at
+companies rather than academic research.  On the research side, Chen et al.
+describe a wet lab that runs its experiments through GitHub issues and
 version control [@chen2025github], showing that researchers will adopt these
 tools.  Their focus is reproducibility within the lab, not quality management
 or regulation.
@@ -548,3 +549,20 @@ identification code and password" [@cfr11].  Part 11 also requires
 approved a change and when, but does not by itself meet all of these
 requirements.  Until the work described in Section 8.1 is done, records that
 need a Part 11 signature should be signed in a system that provides one.
+
+## 8. Objections and Limitations
+
+### 8.1 Electronic Signatures
+
+Todo. Working on this now.  https://github.com/AliakseiT/dearauditor-qms-baseline looks promising
+
+### 8.2 Platform Validation
+
+Todo. We should provide installation and validation guidance
+
+### 8.3 Training Records and Non-Document Controls
+
+### 8.4 Cultural Adoption
+
+## 9. Roadmap
+
