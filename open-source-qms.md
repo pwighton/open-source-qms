@@ -361,6 +361,30 @@ lets each domain draw the line where its own regulations require.
 
 ### 5.3 Deliberate Vendor Neutrality
 
+The idea of running a QMS on a forge is not new.  GitLab publishes guidance on
+"Meeting ISO 13485:2016 Requirements with GitLab", mapping features such as
+merge request approvals, protected branches and issue templates onto a
+medical device QMS [@gitlab13485].  It is careful to add, however, that GitLab
+"isn't a compliance tool and makes no guarantees about compliance"
+[@gitlab13485].  The platform is supplied, but the procedures that make it a
+quality system are left to each organization.  That is the gap this project
+fills.
+
+The QMS deliberately uses only features common to all of the major forges,
+namely GitHub, GitLab, Gitea and Forgejo.  Every primitive in Table 1 meets
+that test, and no feature unique to one platform is required.  Gitea, Forgejo
+and the community edition of GitLab are open source and can be self-hosted,
+so an institution whose data policies require it can keep its quality records
+on its own servers.
+
+Neutrality also protects the records themselves.  Documents and their full
+history live in git, and every copy of a repository is a complete one, so
+moving to another forge means copying the repository.  Issues and pull request
+discussions are stored by the forge rather than in git, but the major forges
+can import them from one another.  A commercial eQMS, by contrast, keeps
+records in a proprietary database, and leaving the vendor can mean negotiating
+an export of the very history an auditor may ask to see.
+
 ### 5.4 Cost
 
 ## 6. Prior Work
