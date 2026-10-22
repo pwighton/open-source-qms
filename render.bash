@@ -8,6 +8,7 @@ cd "$(dirname "$0")"
 
 SRC="open-source-qms.md"
 BIB="refs.bib"
+CSL="ieee.csl"  # numeric [1] citations, from citation-style-language/styles
 OUT="open-source-qms.pdf"
 
 # Preflight checks
@@ -31,6 +32,7 @@ export TMPDIR="$WORKDIR"
 pandoc "$SRC" \
   --citeproc \
   --bibliography="$BIB" \
+  --csl="$CSL" \
   --pdf-engine=tectonic \
   -V geometry:margin=1in \
   -o "$OUT"
