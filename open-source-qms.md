@@ -330,6 +330,35 @@ as training, may belong in institutional systems rather than a repository
 
 ### 5.2 Repository Structure
 
+A QMS built on git is not a single repository but several, each with its own
+history and access controls.  How documents and records are divided among
+them determines what is shared, what is kept private, and who can see what.
+The structure below is a default, which domain overlays and individual sites
+can adapt.
+
+- **Controlled documents.**  The Quality Manual, SOPs and templates live in
+  one repository.  This is the public, shared repository described in
+  Section 4.2, and the one other institutions adopt.
+- **Studies and projects.**  Each study or project has its own repository for
+  its plans, records, deviations and nonconformities. Access is restricted to
+  the people working on it.
+- **Personnel records.**  Records that belong to individuals, such as
+  training, need even tighter access.  Options include one repository per
+  staff member, a single restricted repository, or the institution's existing
+  HR or learning-management system (Section 8.3).
+
+Repositories should also be divided by who routinely inspects them, not only
+by who may read them.  Some quality records are shown to regulators and
+sponsors as a matter of course, while others are kept internal to protect
+candor.  For clinical research, ICH E6(R2) states that "to preserve the
+independence and value of the audit function, the regulatory authority(ies)
+should not routinely request the audit reports" [@fda2018e6r2].  The line is
+not the same everywhere, however.  For medical devices, FDA's Quality
+Management System Regulation, effective since February 2026, "gives the FDA
+the authority to inspect management review, quality audits, and supplier audit
+reports" [@fda2026qmsrfaq].  Keeping these records in separate repositories
+lets each domain draw the line where its own regulations require.
+
 ### 5.3 Deliberate Vendor Neutrality
 
 ### 5.4 Cost
