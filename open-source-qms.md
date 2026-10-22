@@ -244,7 +244,7 @@ overlays that add the procedures, forms and regulatory mappings a particular
 field needs.  A new domain does not need a new QMS, only a new overlay.
 
 The two domains already built, software medical devices and observational
-studies (Section 5), are quite different from each other, which suggests the
+studies (Section 6), are quite different from each other, which suggests the
 core generalizes.  Candidate future domains include imaging core facilities,
 biobanks, AI/ML model development and wet-lab protocols, each of which faces
 reproducibility and quality pressures of its own.
@@ -256,17 +256,17 @@ are typically handed to industry for development, yet "early stage
 (biotechnology) entities often are poorly suited to this task"
 [@stamler2003].  A device company generally needs a QMS aligned with ISO 13485
 to bring a product to market, and it needs one at the point when it can least
-afford one.  The existing software medical device QMS (Section 5) already
+afford one.  The existing software medical device QMS (Section 6) already
 covers much of this ground, and a device overlay built on the same core would
 let a spinout carry its parent lab's quality system with it rather than
 starting again from scratch.
 
-## 5. Prior Work
+## 5. Implementation: QMS as Code
 
-## 6. Implementation: QMS as Code
+### 5.1 Minimal Primitives
 
-### 6.1 Minimal Primitives
+### 5.2 Deliberate Vendor Neutrality
 
-### 6.2 Deliberate Vendor Neutrality
+### 5.3 Cost
 
-### 6.3 Cost
+## 6. Prior Work
