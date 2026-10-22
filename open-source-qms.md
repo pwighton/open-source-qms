@@ -489,3 +489,45 @@ and maps to ISO 9001, ICH E6(R2), E8(R1), E9(R1) and Q9(R1), GAMP 5 and
 QMS.  An institution adopts it by copying the repository, running the workflow
 described in Section 5 on its own copy, and editing the SOPs to fit its own
 structure as it goes.
+
+## 7. Scope of Compliance Claims
+
+No quality system makes an institution compliant by itself.  Compliance
+depends on how a system is implemented, followed and audited at each site, so
+the claims made for this QMS are deliberately limited to what its design can
+support.  They fall into three tiers.
+
+| Tier | Target                                         | What is needed                     |
+|------|------------------------------------------------|------------------------------------|
+| 1    | Reproducibility, provenance and change control | Git and forge primitives alone     |
+| 2    | Domain-specific quality processes              | Primitives plus SOPs and templates |
+| 3    | Electronic signatures under 21 CFR Part 11     | Additional work (Section 8.1)      |
+
+Table: Tiers of compliance claims.
+
+**Tier 1** is met by the primitives of Section 5.1 alone.  Any research group
+that uses git and a forge as described gains a versioned, attributable history
+of its procedures and records, and a reviewed record of every change, whether
+or not it adopts the rest of the QMS.
+
+**Tier 2** needs the SOPs and templates as well.  The primitives supply the
+document and record control that ISO 9001, ISO 13485 and ICH E6 require
+(Section 5.1), but each domain also needs its own quality processes, such as
+study design review, monitoring and adverse-event handling for observational
+studies, or design control and risk management for medical device software.
+The SOPs define those processes, including who reviews and approves, which
+records are kept, and for how long.  This is the tier `obs-qms` targets for
+observational studies (Section 6.3).
+
+**Tier 3** is not yet implemented.  21 CFR Part 11 requires each signed
+electronic record to show "the printed name of the signer", "the date and time
+when the signature was executed" and "the meaning (such as review, approval,
+responsibility, or authorship)" of the signature.  Signatures must be "linked
+to their respective electronic records" so that they "cannot be excised,
+copied, or otherwise transferred", and those not based on biometrics must
+"employ at least two distinct identification components such as an
+identification code and password" [@cfr11].  Part 11 also requires
+"validation of systems" (Section 8.2).  A pull request approval records who
+approved a change and when, but does not by itself meet all of these
+requirements.  Until the work described in Section 8.1 is done, records that
+need a Part 11 signature should be signed in a system that provides one.
