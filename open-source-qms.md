@@ -422,3 +422,70 @@ the license fee and the work of building a QMS from scratch addresses the two
 main barriers to adoption in academia.
 
 ## 6. Prior Work
+
+Several existing efforts partially address parts of the problem described in
+Section 2.
+
+### 6.1 Academic Quality Frameworks
+
+The University of Kentucky's Good Research Practice Resource Center, discussed
+in Section 4.1, brings GLP-inspired quality management to academic research
+through consultation and training [@littrell2020costs].  The closest effort in
+mission is the EQIPD Quality System, developed by a consortium funded by the
+European Union's Innovative Medicines Initiative.  It defines research quality
+as "the extent to which research data are fit for their intended use", sets
+out 18 core requirements, and is "free for anyone to use"
+[@bespalov2021eqipd].  EQIPD deliberately "does not prescribe any
+pre-determined solutions", offering examples through an online toolbox, and it
+is designed for non-regulated preclinical research [@bespalov2021eqipd].  It
+says what a research quality system must achieve, but leaves each unit to
+build its own, and it offers no route to regulatory-grade evidence.  The QMS
+proposed here could serve as one implementation of EQIPD's requirements, with
+a path to regulated use where it is needed.
+
+### 6.2 Git-Based Quality Systems
+
+The closest efforts in form come from medical device software.
+OpenRegulatory publishes markdown templates on GitHub for ISO 13485, IEC
+62304, ISO 14971 and IEC 62366, aimed at device companies
+[@openregulatorytemplates].  They are licensed CC BY-NC-SA 4.0, however,
+which prohibits commercial use and so excludes the spinouts described in
+Section 4.6.  The Royal College of Paediatrics and Child Health (RCPCH) runs
+the ISO 13485 QMS for its Digital Growth Charts on GitHub.  Changes are
+proposed by pull request and need "at least one approving review" before
+merging to a protected branch, and records such as CAPAs, audits and
+management reviews are kept as issues created from templates [@rcpchqms].  It
+is strong evidence that a git-native QMS works in a regulated setting, but it
+serves a single product, although RCPCH intends to extract "generalisable
+patterns" into "a shared template" [@rcpchqms].  On the research side, Chen
+et al. describe a wet lab that runs its experiments through GitHub issues and
+version control [@chen2025github], showing that researchers will adopt these
+tools.  Their focus is reproducibility within the lab, not quality management
+or regulation.
+
+| Effort                                    | Open           | Git-native | SOPs      | Academic | Regulatory |
+|-------------------------|------------|------------|----------|----------|------------|
+| Kentucky GRP Center [@littrell2020costs]  | No             | No         | Partial   | Yes      | Yes        |
+| EQIPD [@bespalov2021eqipd]                | Yes            | No         | Partial   | Yes      | No         |
+| OpenRegulatory [@openregulatorytemplates] | Non-commercial | Partial    | Yes       | No       | Yes        |
+| RCPCH [@rcpchqms]                         | Public         | Yes        | 1 product | No       | Yes        |
+| Chen et al. [@chen2025github]             | Yes            | Yes        | No        | Yes      | No         |
+| This proposal                             | Yes (CC0)      | Yes        | Yes       | Yes      | Yes        |
+
+Table: Existing efforts compared with this proposal.
+
+### 6.3 Our Work
+
+This proposal builds on work already done.  At CorticoMetrics, the author (PW)
+built the company's QMS on GitLab, and it supported the FDA 510(k) clearance
+of the THINQ software in 2020 [@fdak192051].  A git-based QMS has therefore
+already carried a product through an FDA submission.  The boilerplate SOPs on
+which that QMS was built, since published as `qm-sops` [@qmssops], became the
+starting point for `obs-qms` [@obsqms], a QMS for academic institutions
+conducting observational studies whose data are intended for regulatory
+submissions.  It comprises a Quality Manual and 16 SOPs, released under CC0,
+and maps to ISO 9001, ICH E6(R2), E8(R1), E9(R1) and Q9(R1), GAMP 5 and
+21 CFR Parts 11 and 54.  `obs-qms` is a template rather than an operating
+QMS.  An institution adopts it by copying the repository, running the workflow
+described in Section 5 on its own copy, and editing the SOPs to fit its own
+structure as it goes.
