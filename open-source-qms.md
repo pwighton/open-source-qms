@@ -103,8 +103,8 @@ reproducibility crisis and the translation gap.
 
 ## 4. The Benefits of an Open-Source QMS
 
-An open-source QMS removes the licensing cost, but being open source does more
-than that.  It changes how the QMS is built, maintained, and trusted.
+Not only does an open-source QMS remove the licensing costs, it also changes
+how the QMS is built, maintained, and trusted.
 
 ### 4.1 Eliminating Duplicated Effort
 
@@ -123,7 +123,7 @@ described in Section 2.4, each customer pays for a largely empty platform and
 then pays again to have it filled with SOPs, forms and workflows much like
 those every other customer has already paid for.
 
-Sharing what has already been built changes this.  The University of
+Sharing what has already been built inverts this paradigm.  The University of
 Kentucky's Good Research Practice Resource Center, for example, provides
 templates for building a quality management system through consultation and
 training with the researchers it supports [@littrell2020costs].  An
@@ -154,9 +154,9 @@ before.  The World Wide Web Consortium and the Internet Engineering Task Force
 steered competing organizations toward common standards through open,
 collaborative work, and the life sciences need a similar "dynamic,
 collaborative effort to standardize common scientific processes"
-[@freedman2015economics].  An open-source QMS gives the field a place to do
-that work, and to converge over time on controls the community as a whole has
-reviewed.
+[@freedman2015economics].  An open-source QMS gives the field a framework for
+that work, and a way to converge over time on best practices the community as
+a whole has reviewed and vetted.
 
 ### 4.3 Rationale Is Preserved, Not Just the Requirement
 
@@ -189,12 +189,12 @@ For sponsors and regulators, a shared framework means evaluating one QMS
 rather than many.  Today, a sponsor considering an academic partner, or data
 generated in academia, must assess each institution's quality system on its
 own terms.  If sites share a common, public QMS, the sponsor can review it
-once and then focus on how each site has adapted and followed it.  Familiarity
-itself has value.  The University of Kentucky reports that having "a QM
-framework familiar to the pharmaceutical/device industry" broadened its
-industry collaborations [@littrell2020costs].  A QMS shared across many
-institutions extends that familiarity to all of them, which directly narrows
-the translation gap described in Section 2.2.
+once and then focus on how each site has adapted and followed it.  The
+University of Kentucky reports that having "a QM framework familiar to the
+pharmaceutical/device industry" broadened its industry collaborations
+[@littrell2020costs].  A QMS shared across many institutions extends that
+familiarity, which directly narrows the translation gap described in
+Section 2.2.
 
 For multi-site studies, a shared QMS means sites start from the same
 procedures.  Irreproducibility fundamentally "stems from undefined variance in
