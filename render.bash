@@ -29,11 +29,18 @@ WORKDIR="$(mktemp -d "$PWD/render-tmp.XXXXXX")"
 trap 'rm -rf "$WORKDIR"' EXIT
 export TMPDIR="$WORKDIR"
 
+# LaTeX header: silence "Underfull \hbox" warnings from the reference list
+# (cosmetic only), and load the caption package for caption-below.lua
+printf '%s\n' '\hbadness=10000' '\usepackage{caption}' \
+  '\captionsetup[table]{position=below,skip=6pt,labelfont=bf}' > "$WORKDIR/header.tex"
+
 pandoc "$SRC" \
   --citeproc \
   --bibliography="$BIB" \
   --csl="$CSL" \
   -M reference-section-title=References \
+  -H "$WORKDIR/header.tex" \
+  --lua-filter=caption-below.lua \
   --pdf-engine=tectonic \
   -V geometry:margin=1in \
   -o "$OUT"

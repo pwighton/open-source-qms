@@ -309,6 +309,9 @@ provides.
 | Access control and confidentiality  | Repository permissions (Section 5.2)   |
 | Automated conformance checks        | CI (optional)                          |
 
+Table: QMS requirements and the corresponding git or forge primitives to
+implement them.
+
 Because nothing reaches the protected main branch without an approved pull
 request, its head is, by definition, the current approved version of every
 document.  Each document also carries its own effective date, so a revision
