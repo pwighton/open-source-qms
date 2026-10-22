@@ -275,16 +275,55 @@ changing an earlier commit changes the identity of every commit after it.  A
 
 Git is usually used through a hosting platform, or *forge*, such as GitHub,
 GitLab, Gitea or Forgejo.  A forge hosts many repositories, each of which can
-be public or restricted to named people.  Forges add two key features. 
-A *pull request* (a *merge request* on GitLab) proposes a change, shows
-exactly what would change, and records the review, discussion and approval
-before the change is accepted.  An *issue* is a tracked item, such as a
-problem report or a task, with its own discussion and history.  Forges can
-also run automated checks on every proposed change, known as *continuous
-integration* (CI).  Researchers already use these tools for code.  This
-proposal uses them for the documents and records of a quality system.
+be public or restricted to named people.  Forges add two key features.  A
+*pull request* (a *merge request* on GitLab) proposes a change, shows exactly
+what would change, and records the review, discussion and approval before the
+change is accepted.  An *issue* is a tracked item, such as a problem report or
+a task, with its own discussion and history.  Forges can also run automated
+checks on every proposed change, known as *continuous integration* (CI).
+Researchers already use these tools for code.  This proposal uses them for the
+documents and records of a quality system.
 
 ### 5.1 Minimal Primitives
+
+The core requirements of a QMS are generic.  ISO 9001 requires controlled
+documents to be reviewed and approved, protected from loss of integrity, and
+subject to "control of changes (e.g. version control)" [@iso9001].  ISO 13485
+adds that documents be approved "prior to issue", that "the current revision
+status of and changes to documents are identified", and that the "unintended
+use of obsolete documents" be prevented [@iso13485].  For clinical research,
+ICH E6(R2) expects essential documents to be stored in a system that provides
+"document identification, version history, search, and retrieval", and data
+changes to be documented with "no deletion of entered data"
+[@fda2018e6r2].  Each of these maps onto a feature that every forge already
+provides.
+
+| QMS requirement                     | Git or forge primitive                 |
+|-------------------------------------|----------------------------------------|
+| Version history; identify changes   | Commits                                |
+| Current approved version            | Head of a protected main branch        |
+| Review and approval before issue    | Pull requests with required approval   |
+| Identify released versions          | Tags (optional)                        |
+| Nonconformities, CAPA, findings     | Issues with labels                     |
+| Standardized forms and records      | Issue, pull request and file templates |
+| Access control and confidentiality  | Repository permissions (Section 5.2)   |
+| Automated conformance checks        | CI (optional)                          |
+
+Because nothing reaches the protected main branch without an approved pull
+request, its head is, by definition, the current approved version of every
+document.  Each document also carries its own effective date, so a revision
+can be approved before it takes effect, for example while staff are
+retrained.  Earlier versions remain in the history for reference but not at
+the point of use, and staff are trained that the main branch is the only
+authoritative source.  Any copy printed or downloaded from it is marked as
+uncontrolled.
+
+None of these primitives are exotic.  Each is available on every major forge,
+which is what makes the vendor neutrality described in Section 5.3 possible.
+Not every requirement maps this cleanly, however.  Electronic signatures that
+meet 21 CFR Part 11 need additional work (Section 8.1), and some records, such
+as training, may belong in institutional systems rather than a repository
+(Section 8.3).
 
 ### 5.2 Repository Structure
 
