@@ -263,10 +263,33 @@ starting again from scratch.
 
 ## 5. Implementation: QMS as Code
 
+Git is a version-control system widely used in the software industry.  In
+Stack Overflow's 2022 developer survey, 97% of professional developers
+reported using it [@stackoverflow2022survey].  Git tracks a collection of
+files, called a *repository*, and records every change made to them,
+including what changed, who changed it, when, and a message explaining why.
+Each recorded change is called a *commit*, and the sequence of commits forms
+the repository's history.  The history is designed to be tamper-evident, since
+changing an earlier commit changes the identity of every commit after it.  A
+*tag* marks a particular point in the history, such as an approved release.
+
+Git is usually used through a hosting platform, or *forge*, such as GitHub,
+GitLab, Gitea or Forgejo.  A forge hosts many repositories, each of which can
+be public or restricted to named people.  Forges add two features that matter
+here.  A *pull request* (a *merge request* on GitLab) proposes a change, shows
+exactly what would change, and records the review, discussion and approval
+before the change is accepted.  An *issue* is a tracked item, such as a
+problem report or a task, with its own discussion and history.  Forges can
+also run automated checks on every proposed change, known as *continuous
+integration* (CI).  Researchers already use these tools for code.  This
+proposal uses them for the documents and records of a quality system.
+
 ### 5.1 Minimal Primitives
 
-### 5.2 Deliberate Vendor Neutrality
+### 5.2 Repository Structure
 
-### 5.3 Cost
+### 5.3 Deliberate Vendor Neutrality
+
+### 5.4 Cost
 
 ## 6. Prior Work
