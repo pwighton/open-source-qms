@@ -209,9 +209,17 @@ record, not the commit author, is what counts.
 gap.  Forge sessions last days or weeks, so approving is a single click
 inside an existing session.  11.200(a)(1) requires all signature components
 at the first signing in a session and at every signing outside a continuous
-session.  As far as is known, no major forge re-prompts for a password when
-someone approves a pull request.  GitHub's "sudo mode" re-prompts only for
-certain administrative actions **(verify)**.
+session.  *Correction (2026-10-22, after the related-work search in Section
+6.6):* this is true of GitHub, Gitea and Forgejo, but **not of GitLab**.
+GitLab Premium and Ultimate have a merge-request setting, "Require user
+re-authentication (password or SAML) to approve", which forces approvers "to
+first authenticate with either a password or with SAML"; GitLab's
+documentation says it "enables an electronic signature for approvals" and
+cites Part 11.  GitHub announced a public preview of "Proof of Presence" on
+24 September 2026 (re-authentication or MFA before high-impact actions), but
+only for Enterprise Managed Users with Microsoft Entra ID, not yet for pull
+request merges, and with a two-hour window after each challenge.  So gap 1
+remains for GitHub (outside that preview), Gitea, Forgejo and GitLab Free.
 
 **Gap 2: the "printed name" is not controlled.**  11.50(a)(1) requires the
 signer's printed name.  The forge records a username; the display name is
@@ -626,6 +634,15 @@ session that may be days old.  So the forge fails (i), since the first
 signing in a session does not re-use all components, and (ii), since
 approvals made long after login do not use any.  Session inactivity timeouts
 shorten the session but do not add a prompt at the moment of signing.
+
+*Exceptions (Section 5.1, correction):* GitLab Premium/Ultimate can require
+password or SAML re-authentication at each approval, which meets the
+"all components at each signing" rule for approvals.  GitHub's Proof of
+Presence preview re-challenges before some high-impact actions, but not yet
+pull request merges, and then allows two hours without another challenge,
+which does not fit the rule for separate, non-continuous signings.  Even with
+GitLab's setting, rows 2 to 6 still need the evidence format of this design
+(the approval record itself remains in GitLab's database).
 
 **How the design addresses it (hardware token, recommended).**
 
@@ -1046,13 +1063,17 @@ before.
   so it needs procedural controls (separated administration, append-only
   logs, trusted timestamps, possibly a public transparency log), and it is new
   software to validate.
-- **B3. Re-authentication added to the forge.**  No major forge is known to
-  ask for a password again when someone approves a pull request **(verify)**.
-  Gitea and Forgejo are open source, so a "re-enter your password to approve"
-  feature could be contributed upstream.  Their approvals would then meet
-  row 5 directly, with a server-signed record in git for rows 2 to 6.  A
-  genuine opportunity, and a "contribution, not concession" story for the
-  pitch.
+- **B3. Re-authentication in the forge.**  *Already exists in GitLab:*
+  Premium and Ultimate offer "Require user re-authentication (password or
+  SAML) to approve", which GitLab's documentation presents as an electronic
+  signature for Part 11.  GitHub's "Proof of Presence" (public preview,
+  September 2026) does not yet cover pull request merges.  Gitea and Forgejo
+  are open source, so the same feature could be contributed upstream: a
+  genuine opportunity and a "contribution, not concession" story for the
+  pitch.  With forge re-authentication, row 5 is met at approval; a
+  server-signed record in git (or a CI job that converts the approval into a
+  signed tag) still provides rows 2 to 6.  Cost: GitLab's paid tier
+  (Section 5.4 of the pitch: $29 per user per month).
 
 In Family B, trust moves from the signer's device to the server operator.
 Every commercial Part 11 system works this way, so this is acceptable; it
@@ -1086,7 +1107,7 @@ honest answer for Tier 3 until something better is in place.
 | A5 gitsign | Only if the provider forces it | Partly (provider's login records) | No | Sigstore + identity provider | Helper (+ Sigstore) | No |
 | B1 Commercial e-signature | Yes | Vendor's audit trail | n/a | Vendor | Existing account | Yes |
 | B2 Self-hosted signing service | Yes | Server's logs | n/a | Institution's admins | Small web service | Yes |
-| B3 Forge re-authentication | Yes | Server's logs | n/a | Forge admins | Upstream contribution | Yes |
+| B3 Forge re-authentication | Yes | Server's logs | n/a | Forge admins | GitLab Premium today; upstream contribution for Gitea/Forgejo | Yes |
 | C Handwritten + scan | Yes (ink) | Yes (physical signature) | n/a | No | None | No |
 
 #### What "minimal" means depends on the cost being minimised
@@ -1107,6 +1128,99 @@ tokens or built-in device keys for the strongest, server-free option; a
 re-authenticating signing service (self-hosted, or contributed to the
 open-source forges) for web-only signing; or handwritten signatures on
 rendered copies as a zero-infrastructure floor.
+
+### 6.6 Related Work: Other Git-Based Approaches to Part 11
+
+*Searched 2026-10-22.*
+
+**DearAuditor Open eQMS** (closest prior work).  "A GitHub-native electronic
+Quality Management System baseline" by Dr. Aliaksei Tsitovich (DearAuditor,
+Switzerland).  Repository: https://github.com/AliakseiT/dearauditor-qms-baseline
+(created March 2026; active October 2026).  Covers ISO 9001, ISO 13485,
+ISO 14971, IEC 62304, IEC 62366-1, ISO/IEC 27001 and 42001, GDPR/nFADP, with
+an optional GAMP 5 / 21 CFR Part 11 overlay "for clinical-research
+contexts".  GitHub issues hold CAPA, audits, risks and training; pull requests
+are the approval boundary; Actions enforce policy and collect signatures;
+Releases publish immutable records.  Code Apache-2.0; SOPs and templates
+CC BY-SA 4.0 (commercial use allowed, share-alike); adoption free, IQ/OQ/PQ
+validation packages sold separately.
+
+Its article "Part 11 electronic signatures on pull requests" (26 August 2026,
+https://qms.dearauditor.ch/articles/part-11-signatures-on-pull-requests)
+reaches the same diagnosis as Section 5: a GitHub approval is "a fine
+engineering control and a poor signature" (authenticated only at session
+start, no second component at signing, no declared meaning, attaches to a
+branch head that moves).  Its design is Family B (Section 6.5):
+
+- each pull request declares the signature meaning, signer roles and number of
+  signatures; a CI gate rejects missing or malformed declarations;
+- a JSON signer registry maps GitHub accounts to named people and roles;
+- a Cloudflare Worker *outside* GitHub's trust boundary intercepts approvals
+  and requires a time-limited PIN ("No PIN, no signature");
+- a "ceremony screen" shows meaning, role, signer and target hash;
+- the worker records name, meaning, UTC time and exact commit hash as a
+  "cryptographically bound attestation", published with the release under an
+  evidence tag that is never moved or reused.
+
+It states that "Part 11 compliance is a property of an operating installation,
+never of a piece of software."
+
+*Comparison with this design.*
+
+| | DearAuditor | This design |
+|---|---|---|
+| Who authenticates the signer | External server (Cloudflare Worker) checks a PIN | Recommended: signer's own device (token); server options also mapped (Section 6.5) |
+| What is signed | Commit hash, recorded by the worker | The individual document's blob |
+| Where signature records live | Attached to GitHub Releases | Signed git tags in the repository |
+| Forge dependence | GitHub-specific (Apps, Actions, Releases) | Forge-neutral |
+| Audience | Medical device and regulated software teams | Academic research institutions |
+| SOP licence | CC BY-SA 4.0 | CC0 |
+| Trusted time | Not described | RFC 3161 timestamps (Section 5.4) |
+
+**GitLab.**  Premium and Ultimate offer "Require user re-authentication
+(password or SAML) to approve", documented as enabling "an electronic
+signature for approvals" with reference to Part 11 (Section 5.1).  A comment
+in GitHub's community discussion (below) says password entry on approval has
+existed since 2019; SAML re-authentication arrived in GitLab 16.6 to 16.8.
+https://docs.gitlab.com/user/project/merge_requests/approvals/settings/
+
+**GitHub.**  Community discussion #64212 (opened August 2023) requests
+"2FA/password typing as part of the approval process" for Part 11; medical
+device users report the gap costs "tens of thousands of dollars a year" and
+that "the only missing requirement is the e signature implementation".  On
+24 September 2026 GitHub announced a public preview of "Proof of Presence":
+re-authentication or MFA before high-impact actions, for Enterprise Managed
+Users with Microsoft Entra ID only, with a two-hour window; pull request
+merges are not yet covered (support "being built", no date).
+https://github.com/orgs/community/discussions/64212 ;
+https://github.blog/changelog/2026-09-24-require-proof-of-presence-for-high-impact-actions
+
+**OpenRegulatory.**  Their article on a QMS in GitHub/GitLab (site blocked
+automated access; known from a search summary only **(verify)**) reportedly
+says GitHub/GitLab "e-signatures" "most likely aren't 21 CFR Part 11
+compliant", while commit history suffices for EU MDR.  Their templates
+mention electronic signatures only in the software-validation form.
+https://openregulatory.com/quality-management-system-qms-in-github-gitlab/
+
+**Others (weaker).**  Izymes Workzone sells "digital signature approvals" for
+Bitbucket pull requests, alluding to Part 11 in an image caption without
+explaining the mechanism.  Consultant articles (IntuitionLabs, TechVZero) and
+a 2017 PhUSE paper ("Git with It and Version Control!") treat git as
+*supporting* Part 11 controls, not as a signature system.
+
+**Prior work cited in the pitch.**  Littrell 2020 (Kentucky), Bespalov 2021
+(EQIPD) and Chen 2025 say nothing about electronic signatures (EQIPD targets
+non-regulated research by design).  RCPCH treats pull request approval as
+document approval under ISO 13485 and UK regulations, where Part 11 does not
+apply.  GitLab's ISO 13485 page offers no signature mechanism, though its
+approval-settings documentation does (above).
+
+**Implications.**  Part 11 signatures on a git forge are an active area:
+GitLab supports re-authenticated approvals; GitHub is building them; an
+open-source GitHub-native QMS has a working signature service.  This design's
+distinguishing contributions are: forge neutrality; signatures stored in git
+as signed tags on individual document content; a server-free device-key
+option; trusted timestamps; and the academic-research focus.
 
 ## 7. Design
 
@@ -1347,8 +1461,9 @@ browser.
 
 - Section 6.5: platform-authenticator tools (Secretive, TPM-backed SSH
   agents, Windows Hello with OpenSSH) and whether any record user
-  verification in the signature; whether any forge re-prompts for a password
-  on approval; regulatory view of biometric unlock (11.200(b)).
+  verification in the signature; regulatory view of biometric unlock
+  (11.200(b)).  (Resolved: GitLab Premium re-prompts on approval; see
+  Section 5.1.)
 - Row 6: where rendered copies are published; whether CI signs PDFs; SOP
   wording designating the rendered copy as the human-readable form.
 - Row 5: FIDO2 vs OpenPGP tokens (FIDO2 recommended); PIN-retry counts;
@@ -1366,8 +1481,11 @@ browser.
 - Whether FDA accepts a hardware token plus PIN as "two distinct
   identification components" (regulatory judgment; Part 11's example is an
   identification code and password).
-- GitHub "sudo mode" scope; administrator impersonation on GitLab and GitHub
-  Enterprise Server.
+- Administrator impersonation on GitLab and GitHub Enterprise Server.
+- GitHub "Proof of Presence": whether and when it extends to pull request
+  merges and approvals, and whether the two-hour window can be shortened.
+- How the author's CorticoMetrics GitLab QMS handled signatures for the
+  510(k) (first-hand evidence for Sections 6.6 and pitch 8.1).
 - Each forge's default for discarding stale approvals.
 - Format of the FIDO2 flags in SSH signatures (for the CI check, Section
   5.5); whether newer OpenSSH versions accept `verify-required` in the

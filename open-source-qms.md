@@ -457,7 +457,18 @@ merging to a protected branch, and records such as CAPAs, audits and
 management reviews are kept as issues created from templates [@rcpchqms].  It
 is strong evidence that a git-native QMS works in a regulated setting, but it
 serves a single product, although RCPCH intends to extract "generalisable
-patterns" into "a shared template" [@rcpchqms].  On the research side, Chen
+patterns" into "a shared template" [@rcpchqms].  The most complete effort we
+have found is DearAuditor's Open eQMS, released in 2026, "a GitHub-native
+electronic Quality Management System baseline" for medical device and
+regulated software teams [@dearauditorqms].  It covers ISO 9001, ISO 13485 and
+related standards, with an optional overlay for 21 CFR Part 11, and uses
+GitHub issues, pull requests, workflows and releases as the quality system of
+record.  It also implements Part 11 electronic signatures, using a service
+outside GitHub that requires a time-limited PIN at each approval
+[@dearauditorpart11].  Its SOPs are licensed CC BY-SA 4.0, which permits
+commercial use but requires derivatives to adopt the same license.  It is
+built specifically on GitHub, however, and aimed at companies rather than
+academic research.  On the research side, Chen
 et al. describe a wet lab that runs its experiments through GitHub issues and
 version control [@chen2025github], showing that researchers will adopt these
 tools.  Their focus is reproducibility within the lab, not quality management
@@ -469,10 +480,16 @@ or regulation.
 | EQIPD [@bespalov2021eqipd]                | Yes            | No         | Partial   | Yes      | No         |
 | OpenRegulatory [@openregulatorytemplates] | Non-commercial | Partial    | Yes       | No       | Yes        |
 | RCPCH [@rcpchqms]                         | Public         | Yes        | 1 product | No       | Yes        |
+| DearAuditor [@dearauditorqms]             | Share-alike    | Yes        | Yes       | No       | Yes        |
 | Chen et al. [@chen2025github]             | Yes            | Yes        | No        | Yes      | No         |
 | This proposal                             | Yes (CC0)      | Yes        | Yes       | Yes      | Yes        |
 
 Table: Existing efforts compared with this proposal.
+
+This proposal differs from DearAuditor in four ways: its focus on academic
+research, including observational studies; its deliberate neutrality across
+forges (Section 5.3); its CC0 license; and a design for electronic signatures
+that keeps them in git (Section 8.1).
 
 ### 6.3 Our Work
 
